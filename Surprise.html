@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will You Be My Valentine?</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#ff758c,#ff7eb3);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    text-align:center;
+}
+
+h1{
+    font-size:clamp(28px,5vw,50px);
+    color:white;
+    margin-bottom:50px;
+}
+
+/* Floating hearts */
+.heart{
+    position:absolute;
+    color:white;
+    animation:float 6s linear infinite;
+    opacity:0.7;
+    pointer-events:none;
+}
+@keyframes float{
+    from{transform:translateY(100vh);}
+    to{transform:translateY(-10vh);}
+}
+
+/* Button container */
+.button-wrapper{
+    position:relative;
+    width:500px;
+    height:250px;
+}
+
+/* Common button style */
+button{
+    padding:15px 40px;
+    font-size:clamp(16px,4vw,24px);
+    border:none;
+    border-radius:50px;
+    cursor:pointer;
+    transition:0.3s ease;
+    position:absolute;
+}
+
+/* YES button centered */
+#yesBtn{
+    background:#ff2e63;
+    color:white;
+    left:40%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    animation:blink 1s infinite;
+    z-index:2;
+}
+
+@keyframes blink{
+    0%,100%{opacity:1;}
+    50%{opacity:0.4;}
+}
+
+/* NO button separated on right */
+#noBtn{
+    background:#333;
+    color:white;
+    left:73%;
+    top:50%;
+    transform:translate(-50%,-50%);
+}
+
+/* Responsive for mobile */
+@media (max-width:600px){
+    .button-wrapper{
+        width:100%;
+    }
+    #yesBtn{ left:35%; }
+    #noBtn{ left:60%; }
+}
+</style>
+</head>
+<body>
+
+<h1>Will You Be My Valentine? 💖</h1>
+
+<div class="button-wrapper">
+    <button id="yesBtn">YES 💕</button>
+    <button id="noBtn">NO 😢</button>
+</div>
+
+<audio id="bgMusic" loop>
+<source src="https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav">
+</audio>
+
+<script>
+const yesBtn=document.getElementById("yesBtn");
+const noBtn=document.getElementById("noBtn");
+const music=document.getElementById("bgMusic");
+
+let scale=1;
+let angle=0;
+let speed=40;
+let radius=140;
+
+/* iPhone music fix */
+document.body.addEventListener("click",()=>{
+    music.play().catch(()=>{});
+},{once:true});
+
+/* Floating hearts */
+function createHeart(){
+    const heart=document.createElement("div");
+    heart.className="heart";
+    heart.innerHTML="💖";
+    heart.style.left=Math.random()*100+"vw";
+    heart.style.fontSize=(15+Math.random()*20)+"px";
+    heart.style.animationDuration=(3+Math.random()*3)+"s";
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),6000);
+}
+setInterval(createHeart,250);
+
+/* NO orbit logic */
+function moveAround(){
+    angle+=speed;
+    speed+=5;
+    radius+=5;
+
+    const x=radius*Math.cos(angle*Math.PI/180);
+    const y=radius*Math.sin(angle*Math.PI/180);
+
+    noBtn.style.left=`calc(40% + ${x}px)`;
+    noBtn.style.top=`calc(50% + ${y}px)`;
+
+    scale+=0.4;
+    yesBtn.style.transform=`translate(-50%,-50%) scale(${scale})`;
+}
+
+noBtn.addEventListener("click",moveAround);
+noBtn.addEventListener("touchstart",moveAround);
+
+/* YES click */
+yesBtn.addEventListener("click",()=>{
+    document.body.innerHTML=`
+    <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;color:white;">
+        <h1 id="text"></h1>
+        <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif"
+        style="width:260px;border-radius:20px;margin-top:20px;">
+        <canvas id="fireworks" style="position:fixed;top:0;left:0;"></canvas>
+    </div>
+    `;
+    typeEffect("THANKS TANZILAHHHH 💖✨");
+    launchFireworks();
+});
+
+/* Typing effect */
+function typeEffect(text){
+    const el=document.getElementById("text");
+    let i=0;
+    function typing(){
+        if(i<text.length){
+            el.innerHTML+=text.charAt(i);
+            i++;
+            setTimeout(typing,70);
+        }
+    }
+    typing();
+}
+
+/* Fireworks */
+function launchFireworks(){
+    const canvas=document.getElementById("fireworks");
+    const ctx=canvas.getContext("2d");
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+
+    for(let i=0;i<20;i++){
+        setTimeout(()=>{
+            const x=Math.random()*canvas.width;
+            const y=Math.random()*canvas.height;
+            for(let j=0;j<30;j++){
+                ctx.fillStyle="hsl("+Math.random()*360+",100%,50%)";
+                ctx.beginPath();
+                ctx.arc(
+                    x+Math.cos(j)*Math.random()*60,
+                    y+Math.sin(j)*Math.random()*60,
+                    4,0,Math.PI*2
+                );
+                ctx.fill();
+            }
+        },i*300);
+    }
+}
+</script>
+
+</body>
+</html>
